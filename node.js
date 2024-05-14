@@ -1,17 +1,34 @@
+// Dapatkan elemen HTML
+var htmlElement = document.documentElement;
+var bodyElement = document.body;
+
+// Atur overflow menjadi hidden
+htmlElement.style.overflow = 'hidden';
+bodyElement.style.overflow = 'hidden';
+
 // Inisialisasi scene, camera, dan renderer
 var scene = new THREE.Scene();
-var aspectRatio = window.innerWidth / 250; // Aspek rasio untuk renderer dengan tinggi 250
+var aspectRatio = window.innerWidth / window.innerHeight; // Aspek rasio layar
 
-var camera = new THREE.PerspectiveCamera(75, aspectRatio, 0.1, 1000);
+var camera = new THREE.PerspectiveCamera(45, aspectRatio, 0.1, 1000);
 var renderer = new THREE.WebGLRenderer({ alpha: true, preserveDrawingBuffer: true }); // Atur alpha menjadi true untuk background transparan
-renderer.setSize(window.innerWidth, 250); // Ubah ukuran renderer menjadi width 100% dan tinggi 250
+renderer.setSize(window.innerWidth, window.innerHeight); // Ubah ukuran renderer menjadi full screen
+renderer.setPixelRatio(window.devicePixelRatio); // Set pixel ratio
 document.body.appendChild(renderer.domElement);
 
 // Tambahkan cube sebagai dasar headphone
 var geometry = new THREE.BoxGeometry(3, 3, 3); // Mengubah ukuran objek menjadi 3x3x3
+
+// Buat geometri tepi kubus
+var edges = new THREE.EdgesGeometry(geometry);
+var line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0x000000, linewidth: 1 })); // Atur linewidth menjadi 1px
+scene.add(line); // Tambahkan garis tepi ke dalam scene
+
 var material = new THREE.MeshBasicMaterial({ color: 0x00ff00, transparent: true, opacity: 0.5 }); // Atur material menjadi transparan
 var cube = new THREE.Mesh(geometry, material);
-cube.position.set(0, 0, 0); // Menempatkan kubus di tengah-tengah (x: 0, y: 0, z: 0)
+
+// Tempatkan kubus di tengah layar
+cube.position.set(0, 0, -10); // Untuk memastikan kubus ada di depan kamera
 scene.add(cube);
 
 // Atur posisi kamera
@@ -71,6 +88,10 @@ renderer.domElement.addEventListener('mouseup', function() {
 function animate() {
     requestAnimationFrame(animate);
     renderer.render(scene, camera);
+
+    // Perbarui posisi dan rotasi garis tepi bersamaan dengan kubus
+    line.position.copy(cube.position);
+    line.quaternion.copy(cube.quaternion);
 }
 
 // Panggil fungsi animasi
@@ -78,9 +99,9 @@ animate();
 
 // Fungsi untuk menyesuaikan ukuran bingkai renderer saat jendela diubah ukurannya
 function onWindowResize() {
-    camera.aspect = window.innerWidth / 250; // Aspek rasio dengan tinggi 250
+    camera.aspect = window.innerWidth / window.innerHeight; // Aspek rasio layar
     camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, 250); // Ubah ukuran renderer menjadi width 100% dan tinggi 250
+    renderer.setSize(window.innerWidth, window.innerHeight); // Ubah ukuran renderer menjadi full screen
 }
 
 window.addEventListener('resize', onWindowResize, false);
