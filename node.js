@@ -1,6 +1,8 @@
 // Dapatkan elemen HTML
 var htmlElement = document.documentElement;
 var bodyElement = document.body;
+var zoomInButton = document.getElementById('zoomIn');
+var zoomOutButton = document.getElementById('zoomOut');
 
 // Atur overflow menjadi hidden
 htmlElement.style.overflow = 'hidden';
@@ -52,7 +54,7 @@ var previousMousePosition = {
 };
 
 // Tangkap event saat mouse ditekan
-renderer.domElement.addEventListener('mousedown', function(event) {
+renderer.domElement.addEventListener('mousedown', function (event) {
     isRotating = true;
     previousMousePosition = {
         x: event.clientX,
@@ -61,7 +63,7 @@ renderer.domElement.addEventListener('mousedown', function(event) {
 });
 
 // Tangkap event saat mouse bergerak
-renderer.domElement.addEventListener('mousemove', function(event) {
+renderer.domElement.addEventListener('mousemove', function (event) {
     if (isRotating) {
         var deltaMove = {
             x: event.clientX - previousMousePosition.x,
@@ -80,7 +82,7 @@ renderer.domElement.addEventListener('mousemove', function(event) {
 });
 
 // Tangkap event saat mouse dilepas
-renderer.domElement.addEventListener('mouseup', function() {
+renderer.domElement.addEventListener('mouseup', function () {
     isRotating = false;
 });
 
@@ -107,12 +109,12 @@ function onWindowResize() {
 window.addEventListener('resize', onWindowResize, false);
 
 // Tangkap event saat mouse masuk ke dalam elemen renderer
-renderer.domElement.addEventListener('mouseenter', function() {
+renderer.domElement.addEventListener('mouseenter', function () {
     document.addEventListener('wheel', zoomHandler); // Aktifkan event scroll untuk zoom in dan zoom out
 });
 
 // Tangkap event saat mouse meninggalkan elemen renderer
-renderer.domElement.addEventListener('mouseleave', function() {
+renderer.domElement.addEventListener('mouseleave', function () {
     document.removeEventListener('wheel', zoomHandler); // Nonaktifkan event scroll untuk zoom in dan zoom out
 });
 
@@ -124,3 +126,14 @@ function zoomHandler(event) {
         zoomOut(); // Zoom out saat scroll ke bawah
     }
 }
+window.addEventListener('wheel', function (e) {
+    if (e.ctrlKey) {
+        e.preventDefault(); // Mencegah zoom menggunakan Ctrl + Scroll
+    }
+}, { passive: false });
+
+window.addEventListener('keydown', function (e) {
+    if ((e.ctrlKey && (e.key === '+' || e.key === '-' || e.key === '0'))) {
+        e.preventDefault(); // Mencegah zoom menggunakan Ctrl + (+), Ctrl + (-), atau Ctrl + (0)
+    }
+});
